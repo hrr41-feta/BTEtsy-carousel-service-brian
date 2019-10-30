@@ -70,6 +70,12 @@ const updateProduct = (productId, like, callback) => {
     callback(err, docs);
   });
 };
+
+const deleteProduct = (productId, callback) => {
+  MyProductsModel.deleteOne({productId: productId}, (err) => {
+    callback(err);
+  })
+}
 module.exports.updateProduct = updateProduct;
 module.exports.saveProduct = saveProduct;
 module.exports.saveWishlist = saveWishlist;
@@ -78,3 +84,4 @@ module.exports.getWishlists = getWishlists;
 module.exports.getProductById = getProductById;
 module.exports.getWishlistByUsername = getWishlistByUsername;
 module.exports.MyWishlistModel = MyWishlistModel;
+module.exports.deleteProduct = deleteProduct;

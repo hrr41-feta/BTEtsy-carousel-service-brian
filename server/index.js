@@ -32,6 +32,17 @@ app.put('/products/:productId', (req, res) => {
     res.status(200).send(results);
   });
 });
+
+app.delete('/products/:productId', (req, res) => {
+  models.deleteProduct(req.params.productId, (err) => {
+    try {
+      res.send("Deleted product with id " + req.params.productId);
+    }
+    catch(err){
+      console.error(err);
+    }
+  })
+})
 // getting item and username from wishlist
 app.get('/wishlists', (req, res) => {
   models.getWishlists((err, data) => {
