@@ -24,3 +24,6 @@ coverage
 build/
 dist/main.js
 
+# Large csv files
+server/seed/postgres/images.csv
+server/seed/postgres/products.csv

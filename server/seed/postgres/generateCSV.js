@@ -8,19 +8,29 @@ const random = (min, max) => {
   return Math.floor(Math.random()*(max-min) + min);
 }
 
-// writer.pipe(fs.createWriteStream(__dirname + '/products.csv'));
-// for(var i=0; i<10000000; i++){
-//   writer.write({productName: faker.lorem.word()});
-// }
-
-// writer.end();
-
 writer.pipe(fs.createWriteStream(__dirname + '/images.csv'));
-for(var i=0; i<40000000; i++){
-  writer.write({product_id: random(0, 10000000), image: faker.image.cats()});
+let i=40000000
+
+function writeImages() {
+  var ok = true;
+  do {
+    i -= 1;
+    if (i === 0) {
+      // last time!
+      writer.write({id: 40000000-i, image: faker.image.image(), product_id: random(0, 10000000)});
+      console.log('finished');
+      writer.end();
+    } else {
+      // see if we should continue, or wait
+      // don't pass the callback, because we're not done yet.
+      ok = writer.write({id: 40000000-i, image: faker.image.image(), product_id: random(0, 10000000))});
+    }
+  } while (i > 0 && ok);
+  if (i > 0) {
+    // had to stop early!
+    // write some more once it drains
+    writer.once('drain', writeImages);
+  }
 }
 
-writer.end();
-
-
-models.getProducts();
+writeImages();
