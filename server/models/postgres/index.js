@@ -30,5 +30,30 @@ const getProducts = () => {
   })
 }
 
+const copyProducts = (filePath) => {
+  pool.query(`COPY product(product_item, liked) from '${filePath}' DELIMITER ',' CSV HEADER`, (err, res) => {
+    if(err){
+      console.log(err.stack);
+    }
+    else{
+      console.log('success');
+    }
+  })
+}
+
+const copyImages = (filePath) => {
+  pool.query(`COPY picture(product_id, image) from '${filePath}' DELIMITER ',' CSV HEADER`, (err, res) => {
+    if(err){
+      console.log(err.stack);
+    }
+    else{
+      console.log('success');
+    }
+  })
+}
+
+
 module.exports.saveProduct = saveProduct;
 module.exports.getProducts = getProducts;
+module.exports.copyProducts = copyProducts;
+module.exports.copyImages = copyImages;
