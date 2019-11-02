@@ -7,6 +7,7 @@ const app = express();
 app.use(parser.json());
 
 app.use(express.static(`${__dirname}/../dist`));
+
 // get the names and pics of the products
 app.get('/products', (req, res) => {
   models.getProducts((err, data) => {
@@ -23,6 +24,7 @@ app.post('/products', (req, res) => {
   models.saveProduct(req.body.productId, req.body.productItem, req.body.pictureUrl, req.body.like);
   res.end('done');
 });
+
 // update like of productId
 app.put('/products/:productId', (req, res) => {
   models.updateProduct(req.params.productId, req.body.like, (err, results) => {
@@ -42,7 +44,8 @@ app.delete('/products/:productId', (req, res) => {
       console.error(err);
     }
   })
-})
+});
+
 // getting item and username from wishlist
 app.get('/wishlists', (req, res) => {
   models.getWishlists((err, data) => {
@@ -70,6 +73,7 @@ app.get('/products/:productId', (req, res) => {
     }
   });
 });
+
 // getting individual wishlist
 app.get('/wishlists/:username', (req, res) => {
   models.getWishlistByUsername(req.params.username, (err, data) => {
@@ -81,8 +85,10 @@ app.get('/wishlists/:username', (req, res) => {
     }
   });
 });
+
 app.listen(port, () => {
   // eslint-disable-next-line
   console.log(`listening to ${port}`);
 });
+
 module.exports.app = app;
