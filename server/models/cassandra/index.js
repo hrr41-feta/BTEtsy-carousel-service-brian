@@ -18,19 +18,18 @@ const insertProduct = (id, productItem, pictureUrls, liked, callback) => {
 
 const getProductById = (id, callback) => {
   client.execute('SELECT * FROM btetsy.product WHERE id=?', [id], {prepare: true})
-  .then(result => console.log(result.rows[0]))
-  .catch(err => console.error(err));
+  .then(result => callback(null,result.rows[0]))
+  .catch(err => callback(err));
 }
 
-const copyCSV = (path)  => {
-  client.execute(`COPY btetsy.product (id, product_item, picture_url, liked) FROM ${path} WITH HEADER=TRUE;`)
-  .then(result => console.log("Copy succeeded"))
-  .catch(err => console.error(err));
+const updateProductById = (id, liked, callback) => {
+  client.execute("UPDATE btetsy.product SET liked=? WHERE id=?", [liked, id], {prepare: true})
+  .then(result => callback(null,result.rows[0]))
+  .catch(err => callback(err));
 }
-
-copyCSV(__dirname + '/../../seed/cassandra/product_cassandra.csv');
 
 module.exports = {
   getProductById,
   insertProduct,
+  updateProductById,
 }

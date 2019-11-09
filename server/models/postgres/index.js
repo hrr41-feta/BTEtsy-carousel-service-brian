@@ -31,7 +31,7 @@ const getProducts = () => {
 }
 
 const copyProducts = (filePath) => {
-  pool.query(`COPY product(product_item, liked) from '${filePath}' DELIMITER ',' CSV HEADER`, (err, res) => {
+  pool.query(`COPY products(product_item, liked, pictures) from '${filePath}' DELIMITER ',' CSV HEADER`, (err, res) => {
     if(err){
       console.log(err.stack);
     }
