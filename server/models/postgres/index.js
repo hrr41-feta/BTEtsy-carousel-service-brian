@@ -8,8 +8,8 @@ const pool = new Pool({
   port: 5432,
 });
 
-const saveProduct = (productItem, pictureId) => {
-  pool.query('INSERT INTO product(product_item) VALUES ($1)', [productItem], (err, res) => {
+const saveProduct = (productItem, pictures) => {
+  pool.query('INSERT INTO product(product_item, pictures) VALUES ($1, $2)', [productItem, pictures], (err, res) => {
     if(err){
       console.log(err.stack);
     }
@@ -29,6 +29,26 @@ const getProducts = () => {
     }
   })
 }
+
+
+const getProductById = (id, callback) => {
+  pool.query('SELECT * FROM product WHERE id=$1', [id], (err, res) => {
+    if(err){
+      callback(err.stack);
+    }
+    else{
+      callback(null, res.rows[0]);
+    }
+  })
+}
+
+const test = () => {
+  pool.query('SELECT * FROM pg_catalog.pg_tables', function(err, result) {
+    console.log(result);
+  });
+}
+
+test();
 
 const copyProducts = (filePath) => {
   pool.query(`COPY products(product_item, liked, pictures) from '${filePath}' DELIMITER ',' CSV HEADER`, (err, res) => {
@@ -52,8 +72,8 @@ const copyImages = (filePath) => {
   })
 }
 
-
 module.exports.saveProduct = saveProduct;
 module.exports.getProducts = getProducts;
+module.exports.getProductById = getProductById;
 module.exports.copyProducts = copyProducts;
 module.exports.copyImages = copyImages;

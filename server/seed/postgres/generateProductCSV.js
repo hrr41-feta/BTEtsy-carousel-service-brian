@@ -14,12 +14,12 @@ const fs = require('fs');
       i -= 1;
       if (i === 0) {
         // last time!
-        writer.write({product_item: faker.lorem.word(), liked: false});
+        writer.write({product_item: faker.commerce.productName(), liked: false});
         console.log("finished products");
       } else {
         // see if we should continue, or wait
         // don't pass the callback, because we're not done yet.
-        ok = writer.write({product_item: faker.lorem.word(), liked: false});
+        ok = writer.write({product_item: faker.commerce.productName(), liked: false});
       }
     } while (i > 0 && ok);
     if (i > 0) {

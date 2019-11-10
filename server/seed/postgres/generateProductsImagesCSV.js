@@ -8,20 +8,19 @@ const random = (min, max) => {
   return Math.floor(Math.random()*(max-min) + min);
 }
 
+//"'{""someurl"", ""someotherurl""}'"
 const makeString = () => {
-  let build = "";
-  let randomNum = random(2, 6);
-
-  for(var i=0; i<randomNum; i++){
-    if(i !== randomNum - 1){
-      build += faker.image.image() + ";";
+  let build = '';
+  const randomNum = random(2, 6);
+  for(let i=0; i<randomNum; i++){
+    if(i !== randomNum-1){
+      build += "'" + faker.image.image() + "'" + ",";
     }
     else{
-      build += faker.image.image();
+      build += "'" + faker.image.image() + "'";
     }
   }
-
-  return build;
+  return `{${build}}`;
 }
 
 (() => {
