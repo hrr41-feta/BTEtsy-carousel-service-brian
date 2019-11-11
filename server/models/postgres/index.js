@@ -4,34 +4,44 @@ const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
   database: 'btetsy',
-  password: 'abc',
+  password: 'password123',
   port: 5432,
 });
 
-const saveProduct = (productItem, pictureId) => {
-  pool.query('INSERT INTO product(product_item) VALUES ($1)', [productItem], (err, res) => {
-    if(err){
-      console.log(err.stack);
-    }
-    else{
-      console.log('success');
-    }
+const getProductById = (id, callback) => {
+  pool.query('SELECT products.id, product_images.image_url, products.product_item, products.liked FROM product_images INNER JOIN products ON products.id=product_images.product_id AND products.id=$1;', [id])
+  .then(res => {
+    let images = [];
+    let response = {};
+
+    res.rows.forEach(row => {
+      images.push(row.image_url);
+    })
+
+    response.id = res.rows[0].id;
+    response.pictureUrl = images;
+    response.name = res.rows[0].product_item;
+    response.like = res.rows[0].liked;
+
+    callback(null, [response]);
   })
+  .catch(err => {
+    callback(err);
+  });
 }
 
-const getProducts = () => {
-  pool.query('SELECT * FROM product', (err, res) => {
-    if(err){
-      console.log(err.stack);
-    }
-    else{
-      console.log(res.rows[0]);
-    }
+const updateProductById = (id, liked, callback) => {
+  pool.query('UPDATE products SET liked=$1 WHERE id=$2;', [liked, id])
+  .then(res => {
+    callback(null, 'Successfully updated row');
+  })
+  .catch(err => {
+    callback(err);
   })
 }
 
 const copyProducts = (filePath) => {
-  pool.query(`COPY product(product_item, liked) from '${filePath}' DELIMITER ',' CSV HEADER`, (err, res) => {
+  pool.query(`COPY products(product_item, liked, pictures) from '${filePath}' DELIMITER ',' CSV HEADER`, (err, res) => {
     if(err){
       console.log(err.stack);
     }
@@ -52,8 +62,7 @@ const copyImages = (filePath) => {
   })
 }
 
-
-module.exports.saveProduct = saveProduct;
-module.exports.getProducts = getProducts;
+module.exports.getProductById = getProductById;
 module.exports.copyProducts = copyProducts;
 module.exports.copyImages = copyImages;
+module.exports.updateProductById = updateProductById;

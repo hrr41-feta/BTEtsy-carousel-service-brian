@@ -18,13 +18,13 @@ const random = (min, max) => {
       i -= 1;
       if (i === 0) {
         // last time!
-        writer.write({product_id: random(0, 10000000), image: faker.image.image()});
+        writer.write({product_id: random(0, 10000000), image_url: faker.image.image()});
         console.log('finished images');
         writer.end();
       } else {
         // see if we should continue, or wait
         // don't pass the callback, because we're not done yet.
-        ok = writer.write({product_id: random(0, 10000000), image: faker.image.image()});
+        ok = writer.write({product_id: random(0, 10000000), image_url: faker.image.image()});
       }
     } while (i > 0 && ok);
     if (i > 0) {

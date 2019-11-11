@@ -1,12 +1,16 @@
-CREATE TABLE product(
+DROP TABLE IF EXISTS products;
+
+CREATE TABLE products(
 id SERIAL PRIMARY KEY,
 product_item text,
 liked boolean default false
 );
 
-CREATE TABLE picture(
-id SERIAL PRIMARY KEY,
-product_id integer,
-image text
+DROP TABLE IF EXISTS product_images;
+
+CREATE TABLE product_images(
+  product_id int,
+  image_url text
 );
 
+CREATE INDEX product_id_index on product_images (product_id);
