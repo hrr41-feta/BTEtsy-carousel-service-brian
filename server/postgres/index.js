@@ -21,8 +21,41 @@ app.get('/products/:id', (req, res) => {
   })
 })
 
+app.post('/products', (req, res) => {
+  models.saveProduct(req.body.productName, req.body.like, (err, result) => {
+    if(err){
+      res.status(500).send(err);
+    }
+    else{
+      res.send(result);
+    }
+  })
+})
+
+app.post('/products/:product_id/images', (req, res) => {
+  models.saveImageByProductId(req.params.product_id, req.body.url, (err, result) => {
+    if(err){
+      res.status(500).send(err);
+    }
+    else{
+      res.send(result);
+    }
+  })
+})
+
 app.put('/products/:id', (req, res) => {
   models.updateProductById(req.params.id, req.body.like, (err, result) => {
+    if(err){
+      res.status(500).send(err);
+    }
+    else{
+      res.send(result);
+    }
+  })
+})
+
+app.delete('/products/:id', (req, res) => {
+  models.deleteProductById(req.params.id, (err, result) => {
     if(err){
       res.status(500).send(err);
     }
