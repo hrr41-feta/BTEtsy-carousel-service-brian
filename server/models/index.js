@@ -1,87 +1,115 @@
-const mongoose = require('mongoose');
+const { Pool, Client } = require('pg');
+require('dotenv').config();
 
-mongoose.connect('mongodb://localhost/BTetsy', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+const pool = new Pool({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 
-
-const Product = mongoose.Schema({
-  productId: { type: Number, unique: true },
-  productItem: String,
-  pictureUrl: Array,
-  like: Boolean,
-});
-const Wishlist = mongoose.Schema({
-  products: Array,
-  username: { type: String, unique: true },
-});
-
-const MyProductsModel = mongoose.model('Product', Product);
-const MyWishlistModel = mongoose.model('Wishlist', Wishlist);
-
-// save 1 product
-const saveProduct = (productId, productItem, pictureUrl, like) => {
-  const instance = new MyProductsModel({
-    productId,
-    productItem,
-    pictureUrl,
-    like,
-  });
-  instance.save((err) => {
-    if (!err) {
-      // eslint-disable-next-line
-      console.log('success');
-    }
-  });
-};
-
-const saveWishlist = async (products, username) => {
-  const instance = new MyWishlistModel({
-    products,
-    username,
-  });
-  await instance.save();
-};
-
-const getProducts = (callback) => {
-  MyProductsModel.find({}).sort([['productId', 'ascending']]).exec((err, docs) => {
-    callback(err, docs);
-  });
-};
-const getWishlists = (callback) => {
-  MyWishlistModel.find({}, (err, docs) => {
-    callback(err, docs);
-  });
-};
-// get product by id
-const getProductById = (productId, callback) => {
-  MyProductsModel.find({ productId }, (err, docs) => {
-    callback(err, docs);
-  });
-};
-// get wishlist by username
-const getWishlistByUsername = (username, callback) => {
-  MyWishlistModel.find({ username }, callback);
-};
-// update product when liked
-const updateProduct = (productId, like, callback) => {
-  MyProductsModel.updateOne({ productId }, { like }, (err, docs) => {
-    callback(err, docs);
-  });
-};
-
-const deleteProduct = (productId, callback) => {
-  MyProductsModel.deleteOne({productId: productId}, (err) => {
+const saveProduct = (productItem, liked, callback) => {
+  pool.query('INSERT INTO products (product_item, liked) VALUES ($1, $2);', [productItem, liked])
+  .then(res => {
+    callback(null,"Inserted row successfully");
+  })
+  .catch(err => {
     callback(err);
   })
 }
-module.exports.updateProduct = updateProduct;
-module.exports.saveProduct = saveProduct;
-module.exports.saveWishlist = saveWishlist;
-module.exports.getProducts = getProducts;
-module.exports.getWishlists = getWishlists;
-module.exports.getProductById = getProductById;
-module.exports.getWishlistByUsername = getWishlistByUsername;
-module.exports.MyWishlistModel = MyWishlistModel;
-module.exports.deleteProduct = deleteProduct;
+
+const saveImageByProductId = (id, imageURL, callback) => {
+  pool.query('INSERT INTO product_images (product_id, image_url) values ($1, $2);', [id, imageURL])
+  .then(res => {
+    callback(null, "Inserted row successfully");
+  })
+  .catch(err => {
+    callback(err);
+  })
+}
+
+const getProductById = (id, callback) => {
+  pool.query('SELECT products.id, product_images.image_url, products.product_item, products.liked FROM product_images INNER JOIN products ON products.id=product_images.product_id AND products.id=$1;', [id])
+  .then(res => {
+    let images = [];
+    let response = {};
+
+    res.rows.forEach(row => {
+      images.push(row.image_url);
+    })
+
+    response.id = res.rows[0].id;
+    response.pictureUrl = images;
+    response.name = res.rows[0].product_item;
+    response.like = res.rows[0].liked;
+
+    callback(null, [response]);
+  })
+  .catch(err => {
+    callback(err);
+  });
+}
+
+const updateProductById = (id, liked, callback) => {
+  pool.query('UPDATE products SET liked=$1 WHERE id=$2;', [liked, id])
+  .then(res => {
+    callback(null, 'Successfully updated row');
+  })
+  .catch(err => {
+    callback(err);
+  })
+}
+
+//should also delete all images associated with a product_id
+const _deleteImagesById = (id) => {
+  pool.query('DELETE FROM product_images WHERE id=$1', [id])
+  .then(res => {
+    return "Succesfully deleted product images";
+  })
+  .catch(err => {
+    return err;
+  })
+}
+
+const deleteProductById = (id, callback) => {
+  pool.query('DELETE FROM products WHERE id=$1;', [id])
+  .then(res => {
+    callback(null, _deleteImagesById(id));
+  })
+  .catch(err => {
+    callback(err);
+  })
+}
+
+const copyProducts = (filePath) => {
+  pool.query(`COPY products(product_item, liked, pictures) from '${filePath}' DELIMITER ',' CSV HEADER`, (err, res) => {
+    if(err){
+      console.log(err.stack);
+    }
+    else{
+      console.log('success');
+    }
+  })
+}
+
+const copyImages = (filePath) => {
+  pool.query(`COPY picture(product_id, image) from '${filePath}' DELIMITER ',' CSV HEADER`, (err, res) => {
+    if(err){
+      console.log(err.stack);
+    }
+    else{
+      console.log('success');
+    }
+  })
+}
+
+module.exports = {
+  getProductById,
+  copyProducts,
+  copyImages,
+  updateProductById,
+  saveProduct,
+  saveImageByProductId,
+  deleteProductById,
+}

@@ -29,3 +29,6 @@ products.csv
 product_cassandra.csv
 images.csv
 
+# env file
+.env
+
