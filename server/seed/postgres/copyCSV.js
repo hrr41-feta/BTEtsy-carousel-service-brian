@@ -1,4 +1,4 @@
-const models = require('../../models/postgres/index.js');
+const models = require('../../models/index.js');
 
 // models.copyProducts(__dirname + '/products.csv');
 // models.copyImages(__dirname + '/images.csv');
