@@ -5,7 +5,7 @@ const port = 3003;
 const parser = require('body-parser');
 const models = require('./models/index.js');
 
-app.use(express.static(__dirname + '/../../dist'));
+app.use(express.static(__dirname + '/../dist'));
 app.use(parser.json());
 
 app.get('/products/:id', (req, res) => {
