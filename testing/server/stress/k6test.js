@@ -1,14 +1,16 @@
 import http from "k6/http";
-import { Trend } from "k6/metrics";
-
-var myTrend = new Trend("waiting_time");
+import { check } from "k6";
 
 export let options = {
-  duration: '20m',
+  duration: '2m',
   vus: 100,
   rps: 1000
 }
 
 export default function() {
-   var r = http.get("http://localhost:3003/?productId=1232");
+   var randomNum = Math.floor(Math.random()*9999990 + 1);
+   var res1 = http.get(`http://localhost:3003/products/${randomNum}`);
+   check(res1, {
+    "is status 200": (r) => r.status === 200
+  });
 };
