@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const port = 3003;
 const parser = require('body-parser');
-const models = require('../models/postgres/index.js');
+const models = require('./models/index.js');
 
 app.use(express.static(__dirname + '/../../dist'));
 app.use(parser.json());
