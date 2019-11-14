@@ -1,4 +1,3 @@
-const models = require('../../models/postgres/index.js');
 const csvWriter = require('csv-write-stream');
 const writer = csvWriter();
 const faker = require('faker');
