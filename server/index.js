@@ -65,4 +65,8 @@ app.delete('/products/:id', (req, res) => {
   })
 })
 
+app.get('/loaderio-3c117555d0570b55952954071123d791'(req, res) => {
+  res.send('loaderio-3c117555d0570b55952954071123d791');
+})
+
 app.listen(port, () => console.log(`Server listening on port ${port}`));
